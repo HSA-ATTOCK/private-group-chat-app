@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Private Chat</title>
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- emoji picker library -->
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"
+    ></script>
+  </head>
+  <body>
+    <div id="auth">
+      <h2>Login / Signup</h2>
+      <input type="text" id="auth-username" placeholder="Username" />
+      <input type="password" id="auth-password" placeholder="Password" />
+      <button id="login-btn">Login</button>
+      <button id="signup-btn">Sign Up</button>
+      <p id="auth-error"></p>
+    </div>
+
+    <div id="chat-container" class="hidden">
+      <div id="current-user"></div>
+      <div id="typingIndicator" class="typing-indicator"></div>
+
+      <button id="logout-btn">Logout</button>
+      <!-- Group Chat Section -->
+      <div id="group-list" style="margin-top: 20px">
+        <h4>Group</h4>
+        <ul id="groups"></ul>
+        <div id="group-controls">
+          <input type="text" id="new-group-name" placeholder="New group name" />
+          <button id="create-group-btn">Create Group</button>
+        </div>
+      </div>
+      <h
+        >---------------------------------------------------------------------------------------------------------</h
+      >
+
+      <div id="chat">
+        <div id="search-user">
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Enter username to chat"
+          />
+          <button id="search-btn">Search</button>
+        </div>
+        <button id="back-to-private" class="hidden">⬅️ To Private Chat</button>
+        <h3 id="chat-with">Select a user to chat</h3>
+        <div id="search-result" class="message"></div>
+        <div id="messages"></div>
+        <!-- Chat Controls -->
+        <div id="chat-controls" class="hidden">
+          <!-- Emoji Button & Picker -->
+          <div style="position: relative">
+            <button id="emoji-btn">😊</button>
+            <emoji-picker id="emoji-picker"></emoji-picker>
+          </div>
+          <div id="input-area">
+            <input
+              type="text"
+              id="message-input"
+              placeholder="Type a message"
+            />
+            <button id="send-btn">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
