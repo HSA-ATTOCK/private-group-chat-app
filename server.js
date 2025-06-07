@@ -164,10 +164,16 @@ io.on("connection", (socket) => {
     if (isGroup) {
       if (groupTypingUsers[to]) {
         groupTypingUsers[to].delete(socket.username);
+
         if (groupTypingUsers[to].size === 0) {
+          // ❗️Clear the group and notify all members that no one is typing
           delete groupTypingUsers[to];
+          io.to(to).emit("groupTypingUpdate", {
+            groupName: to,
+            typingUsers: [], // <-- This clears the typing indicator on the frontend
+          });
         } else {
-          // Same logic for stopTyping: send updated filtered list to each socket in group
+          // ❗️Update each user with filtered typing list
           const clients = io.sockets.adapter.rooms.get(to);
           if (clients) {
             clients.forEach((socketId) => {
