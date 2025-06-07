@@ -177,6 +177,22 @@ body {
   word-break: break-word;
 }
 
+.message-prompt {
+  position: fixed;
+  top: 60px;
+  background-color: #222;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  z-index: 1000;
+  transition: 0.3s;
+}
+.message-prompt:hover {
+  background-color: #444;
+}
+
 #emoji-btn {
   background: none;
   border: none;
@@ -205,7 +221,7 @@ body {
 /* typing indicator */
 .typing-indicator {
   position: absolute;
-  bottom: 112px;
+  bottom: 105px;
   left: 29px;
   font-style: italic;
   color: #777;
