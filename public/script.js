@@ -1,5 +1,6 @@
 let socket;
 let currentChatUser = null;
+let currentUser = ""; // Set this from your session or login fetch
 let loggedInUser = null;
 let currentGroup = null;
 let groupTypingUsers = new Set();
@@ -62,6 +63,8 @@ function connectSocket() {
   socket.on("privateMessage", ({ from, message, timestamp }) => {
     const time = formatTime(timestamp);
     const msgText = `${from} (${time}): ${message}`;
+
+    // save to history
     if (!messageHistory[from]) messageHistory[from] = [];
     if (!messageHistory[from].includes(msgText)) {
       messageHistory[from].push(msgText);
@@ -69,7 +72,7 @@ function connectSocket() {
     if (from === currentChatUser) {
       addMessage(msgText, from);
     } else {
-      alert(`New message from ${from} at ${time}: ${message}`);
+      showPrompt(from, message, timestamp);
     }
   });
 
@@ -124,6 +127,18 @@ function connectSocket() {
 loginBtn.addEventListener("click", () => {
   const username = usernameInput.value.trim();
   const password = passwordInput.value.trim();
+
+  if (!username) {
+    authError.textContent = "Please enter a username.";
+    return;
+  }
+
+  // Optional: Only check for empty password (or keep full validation if you want)
+  if (!password) {
+    authError.textContent = "Please enter a password.";
+    return;
+  }
+
   fetch("/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -144,6 +159,18 @@ loginBtn.addEventListener("click", () => {
 signupBtn.addEventListener("click", () => {
   const username = usernameInput.value.trim();
   const password = passwordInput.value.trim();
+
+  if (!username) {
+    authError.textContent = "Please enter a username.";
+    return;
+  }
+
+  if (!isValidPassword(password)) {
+    authError.textContent =
+      "Password must be 8-12 characters and include uppercase, lowercase, digit, and special character.";
+    return;
+  }
+
   fetch("/signup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -160,6 +187,12 @@ signupBtn.addEventListener("click", () => {
       }
     });
 });
+
+// for password validation
+function isValidPassword(password) {
+  const regex = /^(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{8,12}$/;
+  return regex.test(password);
+}
 
 logoutBtn.addEventListener("click", () => {
   fetch("/logout", { method: "POST" }).then(() => location.reload());
@@ -307,4 +340,51 @@ function updateTypingIndicatorGroup() {
 
 function setChatMode(isGroup) {
   document.getElementById("chat-controls").classList.toggle("hidden", isGroup);
+}
+
+function openChatWith(username) {
+  currentChatUser = username;
+
+  // Update UI to show chat header
+  const chatWith = document.querySelector("#chat-with");
+  if (chatWith) chatWith.textContent = `Chat with ${username}`;
+
+  // Clear previous chat messages
+  const messagesDiv = document.querySelector("#messages");
+  if (messagesDiv) messagesDiv.innerHTML = "";
+
+  // Load previous messages if any
+  if (messageHistory[username]) {
+    messageHistory[username].forEach((msg) => {
+      addMessage(msg, username);
+    });
+  }
+
+  // Focus the message input
+  const input = document.querySelector("#messageInput");
+  if (input) input.focus();
+}
+
+function addMessage(message, from) {
+  const messagesDiv = document.querySelector("#messages");
+  const div = document.createElement("div");
+  div.className = from === currentUser ? "my-message" : "their-message";
+  div.textContent = message;
+  messagesDiv.appendChild(div);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+function showPrompt(from, message, timestamp) {
+  const prompt = document.createElement("div");
+  const time = formatTime(timestamp);
+  prompt.classList.add("message-prompt");
+  prompt.innerText = `${from} sent: ${message} at (${time})`;
+
+  prompt.addEventListener("click", () => {
+    currentChatUser = from;
+    openChatWith(from); // This switches the chat
+    prompt.remove();
+  });
+
+  document.body.appendChild(prompt);
 }
